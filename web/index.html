@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Elyra</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="chat-panel" aria-label="Conversa">
+        <header class="chat-header">
+          <div class="brand-block">
+            <p class="eyebrow">pywebview</p>
+            <h1>Elyra</h1>
+            <div class="model-summary">
+              <span id="connectionStatus">Configure um provedor</span>
+              <strong id="currentModelLabel">Nenhum modelo selecionado</strong>
+            </div>
+          </div>
+
+          <div class="header-actions">
+            <button id="themeToggleButton" class="ghost-button" type="button">Tema</button>
+            <button id="openSettingsButton" class="ghost-button" type="button">Configurações</button>
+            <button id="clearButton" class="danger-button" type="button">Limpar</button>
+          </div>
+        </header>
+
+        <div id="messages" class="messages" aria-live="polite"></div>
+
+        <form id="chatForm" class="composer">
+          <button id="listenButton" class="tool-button" type="button" aria-label="Ouvir voz" title="Ouvir voz">Mic</button>
+          <input
+            id="messageInput"
+            type="text"
+            autocomplete="off"
+            placeholder="Digite sua mensagem..."
+            aria-label="Mensagem"
+          />
+          <button id="speakToggleButton" class="tool-button" type="button" aria-label="Ativar voz" title="Ativar voz">Voz</button>
+          <button id="sendButton" type="submit">Enviar</button>
+        </form>
+      </section>
+    </main>
+
+    <div id="settingsModal" class="modal" aria-hidden="true">
+      <div id="modalBackdrop" class="modal-backdrop"></div>
+      <section class="modal-card" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+        <header class="modal-header">
+          <div>
+            <p class="eyebrow">Provedor</p>
+            <h2 id="settingsTitle">Configurações</h2>
+          </div>
+          <button id="closeSettingsButton" class="icon-button" type="button" aria-label="Fechar">x</button>
+        </header>
+
+        <form id="settingsForm" class="settings-form">
+          <div class="settings-grid">
+            <label class="field">
+              <span>Provedor</span>
+              <select id="providerSelect"></select>
+            </label>
+
+            <label class="field">
+              <span>Base URL</span>
+              <input id="baseUrlInput" type="text" spellcheck="false" />
+            </label>
+          </div>
+
+          <label class="field">
+            <span>API key</span>
+            <input id="apiKeyInput" type="password" spellcheck="false" placeholder="Opcional para local" />
+          </label>
+
+          <div class="model-tools">
+            <button id="loadModelsButton" class="primary-button" type="button">Carregar modelos</button>
+            <input id="modelSearchInput" type="search" placeholder="Pesquisar modelo..." />
+          </div>
+
+          <div id="modelList" class="model-list" aria-label="Modelos disponíveis"></div>
+
+          <label class="field">
+            <span>Modelo escolhido</span>
+            <input id="modelInput" type="text" spellcheck="false" placeholder="Nenhum modelo selecionado" />
+          </label>
+
+          <label class="field">
+            <span>System prompt</span>
+            <textarea id="systemPromptInput" spellcheck="false"></textarea>
+          </label>
+
+          <footer class="modal-footer">
+            <button id="cancelSettingsButton" class="ghost-button" type="button">Cancelar</button>
+            <button class="save-button" type="submit">Salvar configuração</button>
+          </footer>
+        </form>
+      </section>
+    </div>
+
+    <script src="./app.js"></script>
+  </body>
+</html>
