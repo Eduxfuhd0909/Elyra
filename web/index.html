@@ -3,95 +3,134 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Elyra</title>
+    <title>Elyra - Assistente IA Profissional</title>
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
-    <main class="app-shell">
-      <section class="chat-panel" aria-label="Conversa">
-        <header class="chat-header">
-          <div class="brand-block">
-            <p class="eyebrow">pywebview</p>
+    <div class="app-container">
+      <!-- Sidebar com abas -->
+      <aside class="sidebar">
+        <div class="sidebar-header">
+          <div class="logo">
+            <span class="logo-icon">⚡</span>
             <h1>Elyra</h1>
-            <div class="model-summary">
-              <span id="connectionStatus">Configure um provedor</span>
-              <strong id="currentModelLabel">Nenhum modelo selecionado</strong>
+          </div>
+          <span class="version">v1.0.0</span>
+        </div>
+
+        <div class="tabs-container">
+          <button class="new-chat-btn" id="newChatBtn" title="Nova conversa">
+            <span class="icon">+</span> Nova
+          </button>
+          <div id="chatTabs" class="chat-tabs"></div>
+        </div>
+
+        <div class="sidebar-footer">
+          <button id="settingsBtn" class="sidebar-btn" title="Configurações">
+            <span class="icon">⚙️</span> Configurações
+          </button>
+          <button id="themeBtn" class="sidebar-btn" title="Alternar tema">
+            <span class="icon">🌓</span> Tema
+          </button>
+        </div>
+      </aside>
+
+      <!-- Main Chat Area -->
+      <main class="chat-shell">
+        <header class="chat-header">
+          <div class="header-info">
+            <h2 id="chatTitle">Selecione uma conversa</h2>
+            <div class="model-info">
+              <span id="connectionStatus" class="status-badge">Configure um provedor</span>
+              <strong id="currentModelLabel">Nenhum modelo</strong>
             </div>
           </div>
 
           <div class="header-actions">
-            <button id="themeToggleButton" class="ghost-button" type="button">Tema</button>
-            <button id="openSettingsButton" class="ghost-button" type="button">Configurações</button>
-            <button id="clearButton" class="danger-button" type="button">Limpar</button>
+            <button id="exportBtn" class="icon-btn" title="Exportar conversa">💾</button>
+            <button id="clearBtn" class="icon-btn danger" title="Limpar conversa">🗑️</button>
           </div>
         </header>
 
-        <div id="messages" class="messages" aria-live="polite"></div>
+        <div id="messages" class="messages" aria-live="polite" aria-label="Mensagens do chat"></div>
 
         <form id="chatForm" class="composer">
-          <button id="listenButton" class="tool-button" type="button" aria-label="Ouvir voz" title="Ouvir voz">Mic</button>
-          <input
-            id="messageInput"
-            type="text"
-            autocomplete="off"
-            placeholder="Digite sua mensagem..."
-            aria-label="Mensagem"
-          />
-          <button id="speakToggleButton" class="tool-button" type="button" aria-label="Ativar voz" title="Ativar voz">Voz</button>
-          <button id="sendButton" type="submit">Enviar</button>
+          <div class="input-group">
+            <button id="listenBtn" class="tool-btn" type="button" aria-label="Ouvir" title="Pressione para falar">🎤</button>
+            <input
+              id="messageInput"
+              type="text"
+              autocomplete="off"
+              placeholder="Digite sua mensagem ou pressione Alt+Enter para enviar..."
+              aria-label="Mensagem"
+              spellcheck="true"
+            />
+            <button id="speakToggleBtn" class="tool-btn" type="button" aria-label="Falar" title="Alternar áudio das respostas">🔊</button>
+          </div>
+          <button id="sendBtn" type="submit" class="send-btn">Enviar</button>
         </form>
-      </section>
-    </main>
+      </main>
+    </div>
 
+    <!-- Settings Modal -->
     <div id="settingsModal" class="modal" aria-hidden="true">
-      <div id="modalBackdrop" class="modal-backdrop"></div>
-      <section class="modal-card" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+      <div class="modal-backdrop" id="modalBackdrop"></div>
+      <section class="modal-content" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
         <header class="modal-header">
           <div>
-            <p class="eyebrow">Provedor</p>
             <h2 id="settingsTitle">Configurações</h2>
+            <p class="subtitle">Configure seu provedor de IA e preferências</p>
           </div>
-          <button id="closeSettingsButton" class="icon-button" type="button" aria-label="Fechar">x</button>
+          <button id="closeSettingsBtn" class="close-btn" type="button" aria-label="Fechar">✕</button>
         </header>
 
         <form id="settingsForm" class="settings-form">
-          <div class="settings-grid">
-            <label class="field">
-              <span>Provedor</span>
-              <select id="providerSelect"></select>
-            </label>
+          <div class="settings-section">
+            <h3>Provedor</h3>
+            <div class="form-row">
+              <label class="field">
+                <span>Escolha o provedor</span>
+                <select id="providerSelect" aria-label="Provedor de IA"></select>
+              </label>
+            </div>
+
+            <div class="form-row">
+              <label class="field">
+                <span>Base URL</span>
+                <input id="baseUrlInput" type="text" spellcheck="false" placeholder="Ex: http://localhost:11434" />
+              </label>
+              <label class="field">
+                <span>API Key</span>
+                <input id="apiKeyInput" type="password" spellcheck="false" placeholder="Opcional para provedores locais" />
+              </label>
+            </div>
+          </div>
+
+          <div class="settings-section">
+            <h3>Modelo</h3>
+            <div class="model-loader">
+              <button id="loadModelsBtn" class="btn btn-primary" type="button">Carregar modelos</button>
+              <input id="modelSearchInput" type="search" placeholder="Pesquisar modelo..." aria-label="Pesquisar modelos" />
+            </div>
+            <div id="modelList" class="model-list" aria-label="Modelos disponíveis"></div>
 
             <label class="field">
-              <span>Base URL</span>
-              <input id="baseUrlInput" type="text" spellcheck="false" />
+              <span>Modelo selecionado</span>
+              <input id="modelInput" type="text" spellcheck="false" placeholder="Nenhum modelo selecionado" readonly />
             </label>
           </div>
 
-          <label class="field">
-            <span>API key</span>
-            <input id="apiKeyInput" type="password" spellcheck="false" placeholder="Opcional para local" />
-          </label>
-
-          <div class="model-tools">
-            <button id="loadModelsButton" class="primary-button" type="button">Carregar modelos</button>
-            <input id="modelSearchInput" type="search" placeholder="Pesquisar modelo..." />
+          <div class="settings-section">
+            <h3>System Prompt</h3>
+            <label class="field">
+              <span>Instruções da assistente</span>
+              <textarea id="systemPromptInput" spellcheck="false" rows="6"></textarea>
+            </label>
           </div>
-
-          <div id="modelList" class="model-list" aria-label="Modelos disponíveis"></div>
-
-          <label class="field">
-            <span>Modelo escolhido</span>
-            <input id="modelInput" type="text" spellcheck="false" placeholder="Nenhum modelo selecionado" />
-          </label>
-
-          <label class="field">
-            <span>System prompt</span>
-            <textarea id="systemPromptInput" spellcheck="false"></textarea>
-          </label>
 
           <footer class="modal-footer">
-            <button id="cancelSettingsButton" class="ghost-button" type="button">Cancelar</button>
-            <button class="save-button" type="submit">Salvar configuração</button>
+            <button id="cancelSettingsBtn" class="btn btn-secondary" type="button">Cancelar</button>
+            <button class="btn btn-primary" type="submit">Salvar configuração</button>
           </footer>
         </form>
       </section>

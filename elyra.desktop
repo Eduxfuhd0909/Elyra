@@ -1,0 +1,12 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Elyra
+Comment=Assistente IA profissional multi-provedor
+Exec=elyra
+Icon=elyra
+Terminal=false
+Categories=Utility;Chat;Development;
+Keywords=IA;Chat;Assistente;
+X-GNOME-Autostart-enabled=false
+MimeType=text/plain
