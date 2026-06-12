@@ -7,12 +7,67 @@
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
+    <svg class="svg-sprite" aria-hidden="true" focusable="false">
+      <symbol id="icon-spark" viewBox="0 0 24 24">
+        <path d="M13 2 4 14h7l-1 8 10-13h-7l1-7Z" />
+      </symbol>
+      <symbol id="icon-plus" viewBox="0 0 24 24">
+        <path d="M12 5v14M5 12h14" />
+      </symbol>
+      <symbol id="icon-settings" viewBox="0 0 24 24">
+        <path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z" />
+        <path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.04.04a2 2 0 0 1-2.83 2.83l-.04-.04a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1.04 1.56V21a2 2 0 0 1-4 0v-.08A1.7 1.7 0 0 0 8.96 19.36a1.7 1.7 0 0 0-1.87.34l-.04.04a2 2 0 1 1-2.83-2.83l.04-.04A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-1.56-1.04H3a2 2 0 0 1 0-4h.08A1.7 1.7 0 0 0 4.64 8.9a1.7 1.7 0 0 0-.34-1.87l-.04-.04a2 2 0 1 1 2.83-2.83l.04.04A1.7 1.7 0 0 0 9 4.56 1.7 1.7 0 0 0 10.04 3V3a2 2 0 0 1 4 0v.08A1.7 1.7 0 0 0 15.1 4.64a1.7 1.7 0 0 0 1.87-.34l.04-.04a2 2 0 1 1 2.83 2.83l-.04.04a1.7 1.7 0 0 0-.34 1.87 1.7 1.7 0 0 0 1.56 1.04H21a2 2 0 0 1 0 4h-.08A1.7 1.7 0 0 0 19.4 15Z" />
+      </symbol>
+      <symbol id="icon-moon" viewBox="0 0 24 24">
+        <path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5Z" />
+      </symbol>
+      <symbol id="icon-sun" viewBox="0 0 24 24">
+        <path d="M12 18a6 6 0 1 0 0-12 6 6 0 0 0 0 12ZM12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" />
+      </symbol>
+      <symbol id="icon-save" viewBox="0 0 24 24">
+        <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2Z" />
+        <path d="M17 21v-8H7v8M7 3v5h8" />
+      </symbol>
+      <symbol id="icon-check" viewBox="0 0 24 24">
+        <path d="m5 12 4 4L19 6" />
+      </symbol>
+      <symbol id="icon-send" viewBox="0 0 24 24">
+        <path d="M22 2 11 13" />
+        <path d="m22 2-7 20-4-9-9-4 20-7Z" />
+      </symbol>
+      <symbol id="icon-refresh" viewBox="0 0 24 24">
+        <path d="M21 12a9 9 0 0 1-15.5 6.2" />
+        <path d="M3 12A9 9 0 0 1 18.5 5.8" />
+        <path d="M18 2v4h4M6 22v-4H2" />
+      </symbol>
+      <symbol id="icon-trash" viewBox="0 0 24 24">
+        <path d="M3 6h18M8 6V4h8v2M6 6l1 15h10l1-15M10 11v6M14 11v6" />
+      </symbol>
+      <symbol id="icon-mic" viewBox="0 0 24 24">
+        <path d="M12 14a4 4 0 0 0 4-4V6a4 4 0 1 0-8 0v4a4 4 0 0 0 4 4Z" />
+        <path d="M19 10a7 7 0 0 1-14 0M12 17v4M8 21h8" />
+      </symbol>
+      <symbol id="icon-record" viewBox="0 0 24 24">
+        <path d="M12 19a7 7 0 1 0 0-14 7 7 0 0 0 0 14Z" />
+      </symbol>
+      <symbol id="icon-volume" viewBox="0 0 24 24">
+        <path d="M4 9v6h4l5 4V5L8 9H4Z" />
+        <path d="M16 8.5a5 5 0 0 1 0 7M19 6a9 9 0 0 1 0 12" />
+      </symbol>
+      <symbol id="icon-mute" viewBox="0 0 24 24">
+        <path d="M4 9v6h4l5 4V5L8 9H4Z" />
+        <path d="m18 9 4 4M22 9l-4 4" />
+      </symbol>
+      <symbol id="icon-close" viewBox="0 0 24 24">
+        <path d="M6 6l12 12M18 6 6 18" />
+      </symbol>
+    </svg>
     <div class="app-container">
       <!-- Sidebar com abas -->
       <aside class="sidebar">
         <div class="sidebar-header">
           <div class="logo">
-            <span class="logo-icon">⚡</span>
+            <svg class="logo-icon"><use href="#icon-spark"></use></svg>
             <h1>Elyra</h1>
           </div>
           <span class="version">v1.0.0</span>
@@ -20,17 +75,17 @@
 
         <div class="tabs-container">
           <button class="new-chat-btn" id="newChatBtn" title="Nova conversa">
-            <span class="icon">+</span> Nova
+            <svg class="btn-icon"><use href="#icon-plus"></use></svg> Nova
           </button>
           <div id="chatTabs" class="chat-tabs"></div>
         </div>
 
         <div class="sidebar-footer">
           <button id="settingsBtn" class="sidebar-btn" title="Configurações">
-            <span class="icon">⚙️</span> Configurações
+            <svg class="btn-icon"><use href="#icon-settings"></use></svg> Configurações
           </button>
           <button id="themeBtn" class="sidebar-btn" title="Alternar tema">
-            <span class="icon">🌓</span> Tema
+            <svg class="btn-icon" data-theme-icon><use href="#icon-sun"></use></svg> <span data-theme-label>Claro</span>
           </button>
         </div>
       </aside>
@@ -47,8 +102,12 @@
           </div>
 
           <div class="header-actions">
-            <button id="exportBtn" class="icon-btn" title="Exportar conversa">💾</button>
-            <button id="clearBtn" class="icon-btn danger" title="Limpar conversa">🗑️</button>
+            <button id="exportBtn" class="icon-btn" title="Exportar conversa" aria-label="Exportar conversa">
+              <svg class="btn-icon"><use href="#icon-save"></use></svg>
+            </button>
+            <button id="clearBtn" class="icon-btn danger" title="Limpar conversa" aria-label="Limpar conversa">
+              <svg class="btn-icon"><use href="#icon-trash"></use></svg>
+            </button>
           </div>
         </header>
 
@@ -56,7 +115,9 @@
 
         <form id="chatForm" class="composer">
           <div class="input-group">
-            <button id="listenBtn" class="tool-btn" type="button" aria-label="Ouvir" title="Pressione para falar">🎤</button>
+            <button id="listenBtn" class="tool-btn" type="button" aria-label="Ouvir" title="Pressione para falar">
+              <svg class="btn-icon"><use href="#icon-mic"></use></svg>
+            </button>
             <input
               id="messageInput"
               type="text"
@@ -65,9 +126,14 @@
               aria-label="Mensagem"
               spellcheck="true"
             />
-            <button id="speakToggleBtn" class="tool-btn" type="button" aria-label="Falar" title="Alternar áudio das respostas">🔊</button>
+            <button id="speakToggleBtn" class="tool-btn" type="button" aria-label="Falar" title="Alternar áudio das respostas">
+              <svg class="btn-icon"><use href="#icon-volume"></use></svg>
+            </button>
           </div>
-          <button id="sendBtn" type="submit" class="send-btn">Enviar</button>
+          <button id="sendBtn" type="submit" class="send-btn">
+            <svg class="btn-icon"><use href="#icon-send"></use></svg>
+            <span>Enviar</span>
+          </button>
         </form>
       </main>
     </div>
@@ -81,7 +147,9 @@
             <h2 id="settingsTitle">Configurações</h2>
             <p class="subtitle">Configure seu provedor de IA e preferências</p>
           </div>
-          <button id="closeSettingsBtn" class="close-btn" type="button" aria-label="Fechar">✕</button>
+          <button id="closeSettingsBtn" class="close-btn" type="button" aria-label="Fechar">
+            <svg class="btn-icon"><use href="#icon-close"></use></svg>
+          </button>
         </header>
 
         <form id="settingsForm" class="settings-form">
@@ -109,7 +177,10 @@
           <div class="settings-section">
             <h3>Modelo</h3>
             <div class="model-loader">
-              <button id="loadModelsBtn" class="btn btn-primary" type="button">Carregar modelos</button>
+              <button id="loadModelsBtn" class="btn btn-primary" type="button">
+                <svg class="btn-icon"><use href="#icon-refresh"></use></svg>
+                <span>Carregar modelos</span>
+              </button>
               <input id="modelSearchInput" type="search" placeholder="Pesquisar modelo..." aria-label="Pesquisar modelos" />
             </div>
             <div id="modelList" class="model-list" aria-label="Modelos disponíveis"></div>
@@ -128,9 +199,19 @@
             </label>
           </div>
 
+          <div class="privacy-note">
+            Histórico e configurações ficam salvos localmente. Recursos de voz podem usar serviços externos de reconhecimento e síntese.
+          </div>
+
           <footer class="modal-footer">
-            <button id="cancelSettingsBtn" class="btn btn-secondary" type="button">Cancelar</button>
-            <button class="btn btn-primary" type="submit">Salvar configuração</button>
+            <button id="cancelSettingsBtn" class="btn btn-secondary" type="button">
+              <svg class="btn-icon"><use href="#icon-close"></use></svg>
+              <span>Cancelar</span>
+            </button>
+            <button class="btn btn-primary" type="submit">
+              <svg class="btn-icon"><use href="#icon-check"></use></svg>
+              <span>Salvar configuração</span>
+            </button>
           </footer>
         </form>
       </section>

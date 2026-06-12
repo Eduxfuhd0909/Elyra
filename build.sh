@@ -16,22 +16,11 @@ fi
 
 # Clean old builds
 echo "🧹 Limpando builds antigos..."
-rm -rf build/ dist/ *.spec 2>/dev/null || true
+rm -rf build/ dist/ 2>/dev/null || true
 
 # Create build
 echo "📦 Compilando Elyra..."
-pyinstaller \
-    --name Elyra \
-    --onefile \
-    --windowed \
-    --icon=web/icon.ico \
-    --add-data="web:web" \
-    --add-data="system_prompt.txt:." \
-    --collect-all=pywebview \
-    --collect-all=edge_tts \
-    --collect-all=speech_recognition \
-    --hidden-import=pywebview.api \
-    app.py
+pyinstaller elyra.spec --noconfirm --clean
 
 echo "✅ Build completo!"
 echo ""

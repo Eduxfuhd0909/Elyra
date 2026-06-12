@@ -3,16 +3,23 @@ class ChatTabManager {
   constructor() {
     this.chats = new Map();
     this.currentChatId = null;
-    this.nextChatId = 1;
   }
 
-  createChat(title = null) {
-    const id = this.nextChatId++;
+  setChats(chats) {
+    this.chats.clear();
+    chats.forEach((chat) => this.addChat(chat));
+    if (!this.currentChatId && chats.length) {
+      this.currentChatId = chats[0].id;
+    }
+  }
+
+  addChat(chatData) {
+    const id = chatData.id;
     const chat = {
       id,
-      title: title || `Conversa ${id}`,
-      messages: [],
-      timestamp: Date.now(),
+      title: chatData.title || "Conversa",
+      messages: chatData.messages || [],
+      timestamp: chatData.updated_at ? Date.parse(chatData.updated_at) : Date.now(),
     };
     this.chats.set(id, chat);
     this.currentChatId = id;
@@ -86,6 +93,8 @@ const modelSearchInput = document.querySelector("#modelSearchInput");
 const modelList = document.querySelector("#modelList");
 const modelInput = document.querySelector("#modelInput");
 const systemPromptInput = document.querySelector("#systemPromptInput");
+const themeIcon = document.querySelector("[data-theme-icon] use");
+const themeLabel = document.querySelector("[data-theme-label]");
 
 /* ===== State ===== */
 const tabManager = new ChatTabManager();
@@ -94,19 +103,32 @@ let models = [];
 let selectedModel = "";
 let voiceEnabled = true;
 let currentAudio = null;
+const DISCORD_TOKEN_COMMAND = /^\/token\s+.+/is;
 
 /* ===== Initialization ===== */
 function initializeChat() {
-  tabManager.createChat("Conversa 1");
   renderChatTabs();
   displayCurrentChat();
+}
+
+function iconMarkup(iconId) {
+  return `<svg class="btn-icon"><use href="#${iconId}"></use></svg>`;
+}
+
+function setButtonIcon(button, iconId, label = "") {
+  button.innerHTML = `${iconMarkup(iconId)}${label ? ` <span>${label}</span>` : ""}`;
 }
 
 /* ===== Theme ===== */
 function applyTheme(theme) {
   document.documentElement.dataset.theme = theme;
   localStorage.setItem("elyra-theme", theme);
-  themeBtn.textContent = theme === "dark" ? "☀️ Claro" : "🌙 Escuro";
+  if (themeIcon) {
+    themeIcon.setAttribute("href", theme === "dark" ? "#icon-sun" : "#icon-moon");
+  }
+  if (themeLabel) {
+    themeLabel.textContent = theme === "dark" ? "Claro" : "Escuro";
+  }
 }
 
 /* ===== Chat Tabs ===== */
@@ -121,10 +143,18 @@ function renderChatTabs() {
 
     const closeBtn = document.createElement("button");
     closeBtn.className = "chat-tab-close";
-    closeBtn.textContent = "×";
-    closeBtn.addEventListener("click", (e) => {
+    closeBtn.innerHTML = iconMarkup("icon-close");
+    closeBtn.title = "Fechar conversa";
+    closeBtn.setAttribute("aria-label", "Fechar conversa");
+    closeBtn.addEventListener("click", async (e) => {
       e.stopPropagation();
       if (chats.length > 1) {
+        try {
+          await window.pywebview.api.delete_chat(chat.id);
+        } catch (error) {
+          addMessage("assistant", "Não consegui apagar esta conversa.");
+          return;
+        }
         tabManager.deleteChat(chat.id);
         renderChatTabs();
         displayCurrentChat();
@@ -144,7 +174,11 @@ function renderChatTabs() {
 
 function displayCurrentChat() {
   const chat = tabManager.getCurrentChat();
-  if (!chat) return;
+  if (!chat) {
+    chatTitle.textContent = "Nenhuma conversa";
+    messages.innerHTML = "";
+    return;
+  }
 
   chatTitle.textContent = chat.title;
   messages.innerHTML = "";
@@ -197,15 +231,34 @@ function parsePayload(raw) {
   return typeof raw === "string" ? JSON.parse(raw) : raw;
 }
 
+async function loadChats() {
+  const raw = await window.pywebview.api.list_chats();
+  const response = parsePayload(raw);
+  if (!response.ok) {
+    throw new Error(response.error || "Falha ao carregar conversas.");
+  }
+
+  const chats = [];
+  for (const chat of response.chats) {
+    const historyRaw = await window.pywebview.api.get_history(chat.id);
+    const historyResponse = parsePayload(historyRaw);
+    chats.push({
+      ...chat,
+      messages: historyResponse.ok ? historyResponse.history : [],
+    });
+  }
+
+  tabManager.setChats(chats);
+  initializeChat();
+}
+
 /* ===== Providers & Models ===== */
 function selectedProvider() {
   return providers.find((provider) => provider.id === providerSelect.value);
 }
 
 function updateStatus() {
-  const provider = selectedProvider();
-  const providerName = provider ? provider.name : "Provedor";
-  connectionStatus.textContent = selectedModel ? "✓ Pronto" : "⚠ Aguardando modelo";
+  connectionStatus.textContent = selectedModel ? "Pronto" : "Aguardando modelo";
   currentModelLabel.textContent = selectedModel || "Nenhum modelo";
 }
 
@@ -221,13 +274,15 @@ function renderProviders(settings) {
 
   providerSelect.value = settings.provider_id;
   baseUrlInput.value = settings.base_url;
-  apiKeyInput.value = settings.api_key;
+  apiKeyInput.value = "";
   modelInput.value = settings.model;
   systemPromptInput.value = settings.system_prompt || "";
   selectedModel = settings.model;
 
   const provider = selectedProvider();
-  apiKeyInput.placeholder = provider && provider.needs_key ? "Obrigatória para este provedor" : "Opcional para local";
+  apiKeyInput.placeholder = settings.has_api_key
+    ? "Chave salva. Preencha apenas para trocar."
+    : provider && provider.needs_key ? "Obrigatória para este provedor" : "Opcional para local";
   updateStatus();
 }
 
@@ -267,7 +322,7 @@ function renderModels() {
 
 async function loadModels() {
   loadModelsBtn.disabled = true;
-  loadModelsBtn.textContent = "Carregando...";
+  setButtonIcon(loadModelsBtn, "icon-refresh", "Carregando...");
 
   try {
     const raw = await window.pywebview.api.list_models(
@@ -286,14 +341,14 @@ async function loadModels() {
 
     models = response.models;
     renderModels();
-    addMessage("assistant", `✓ ${models.length} modelo(s) carregado(s).`);
+    addMessage("assistant", `${models.length} modelo(s) carregado(s).`);
   } catch (error) {
     models = [];
     renderModels();
-    addMessage("assistant", "❌ Erro ao carregar modelos. Verifique o terminal.");
+    addMessage("assistant", "Erro ao carregar modelos. Verifique o terminal.");
   } finally {
     loadModelsBtn.disabled = false;
-    loadModelsBtn.textContent = "Carregar modelos";
+    setButtonIcon(loadModelsBtn, "icon-refresh", "Carregar modelos");
   }
 }
 
@@ -316,7 +371,7 @@ async function saveSettings(showMessage = true) {
   updateStatus();
 
   if (showMessage) {
-    addMessage("assistant", "✓ Configuração salva.");
+    addMessage("assistant", "Configuração salva.");
     closeSettings();
   }
 
@@ -350,7 +405,7 @@ async function speakText(content) {
 
 async function listenOnce() {
   listenBtn.disabled = true;
-  listenBtn.textContent = "🔴 Ouvindo...";
+  setButtonIcon(listenBtn, "icon-record");
 
   try {
     const raw = await window.pywebview.api.listen_once();
@@ -364,28 +419,34 @@ async function listenOnce() {
     input.value = response.text;
     await sendMessage(response.text);
   } catch (error) {
-    addMessage("assistant", "❌ Erro ao acessar o microfone.");
+    addMessage("assistant", "Erro ao acessar o microfone.");
   } finally {
     listenBtn.disabled = false;
-    listenBtn.textContent = "🎤";
+    setButtonIcon(listenBtn, "icon-mic");
   }
 }
 
 /* ===== Chat ===== */
 async function sendMessage(content) {
+  const chat = tabManager.getCurrentChat();
+  if (!chat) {
+    addMessage("assistant", "Crie uma conversa antes de enviar mensagens.");
+    return;
+  }
+
   const saved = await saveSettings(false);
   if (!saved) {
     return;
   }
 
-  addMessage("user", content);
+  addMessage("user", DISCORD_TOKEN_COMMAND.test(content.trim()) ? "/token ********" : content);
   input.value = "";
   input.disabled = true;
   sendBtn.disabled = true;
-  sendBtn.textContent = "Enviando...";
+  setButtonIcon(sendBtn, "icon-send", "Enviando...");
 
   try {
-    const raw = await window.pywebview.api.send_message(content);
+    const raw = await window.pywebview.api.send_message(chat.id, content);
     const response = parsePayload(raw);
     const reply = response.reply || "Não consegui responder agora.";
     addMessage("assistant", reply);
@@ -393,11 +454,11 @@ async function sendMessage(content) {
       speakText(reply);
     }
   } catch (error) {
-    addMessage("assistant", "❌ Erro ao falar com o Python. Verifique o terminal.");
+    addMessage("assistant", "Erro ao falar com o Python. Verifique o terminal.");
   } finally {
     input.disabled = false;
     sendBtn.disabled = false;
-    sendBtn.textContent = "Enviar";
+    setButtonIcon(sendBtn, "icon-send", "Enviar");
     input.focus();
   }
 }
@@ -431,23 +492,34 @@ function exportChat() {
   a.click();
   URL.revokeObjectURL(url);
 
-  addMessage("assistant", "✓ Conversa exportada como Markdown.");
+  addMessage("assistant", "Conversa exportada como Markdown.");
 }
 
 /* ===== Event Listeners ===== */
-newChatBtn.addEventListener("click", () => {
-  tabManager.createChat();
-  renderChatTabs();
-  displayCurrentChat();
-  input.focus();
+newChatBtn.addEventListener("click", async () => {
+  try {
+    const raw = await window.pywebview.api.create_chat("");
+    const response = parsePayload(raw);
+    if (!response.ok) {
+      addMessage("assistant", response.error || "Não consegui criar uma nova conversa.");
+      return;
+    }
+    tabManager.addChat(response.chat);
+    renderChatTabs();
+    displayCurrentChat();
+    input.focus();
+  } catch (error) {
+    addMessage("assistant", "Não consegui criar uma nova conversa.");
+  }
 });
 
 clearBtn.addEventListener("click", async () => {
-  if (!tabManager.getCurrentChat().messages.length) return;
-  tabManager.clearChat(tabManager.currentChatId);
+  const chat = tabManager.getCurrentChat();
+  if (!chat || !chat.messages.length) return;
+  tabManager.clearChat(chat.id);
   messages.innerHTML = "";
-  await window.pywebview.api.clear_chat();
-  addMessage("assistant", "✓ Conversa limpa.");
+  await window.pywebview.api.clear_chat(chat.id);
+  addMessage("assistant", "Conversa limpa.");
 });
 
 exportBtn.addEventListener("click", exportChat);
@@ -487,7 +559,7 @@ listenBtn.addEventListener("click", listenOnce);
 speakToggleBtn.addEventListener("click", () => {
   voiceEnabled = !voiceEnabled;
   speakToggleBtn.classList.toggle("active", voiceEnabled);
-  speakToggleBtn.textContent = voiceEnabled ? "🔊" : "🔇";
+  setButtonIcon(speakToggleBtn, voiceEnabled ? "icon-volume" : "icon-mute");
 });
 
 settingsForm.addEventListener("submit", async (event) => {
@@ -505,9 +577,7 @@ form.addEventListener("submit", (event) => {
 
 /* ===== Initialization on Ready ===== */
 window.addEventListener("pywebviewready", async () => {
-  initializeChat();
-
-  const savedTheme = localStorage.getItem("elyra-theme") || "light";
+  const savedTheme = localStorage.getItem("elyra-theme") || "dark";
   applyTheme(savedTheme);
 
   try {
@@ -516,21 +586,15 @@ window.addEventListener("pywebviewready", async () => {
     providers = response.providers;
     renderProviders(response.settings);
     renderModels();
+    await loadChats();
 
-    const historyRaw = await window.pywebview.api.get_history();
-    const historyResponse = parsePayload(historyRaw);
-    if (historyResponse.ok && historyResponse.history.length) {
-      const chat = tabManager.getCurrentChat();
-      historyResponse.history.forEach((message) => {
-        tabManager.addMessage(chat.id, message.role, message.content);
-        addMessageToDOM(message.role, message.content);
-      });
-    } else {
+    const chat = tabManager.getCurrentChat();
+    if (!chat || !chat.messages.length) {
       addMessage("assistant", "Bem-vindo à Elyra! Configure um provedor e selecione um modelo para começar.");
     }
   } catch (error) {
     console.error("Erro ao carregar configurações:", error);
-    addMessage("assistant", "❌ Erro ao carregar configurações. Verifique o terminal.");
+    addMessage("assistant", "Erro ao carregar configurações. Verifique o terminal.");
   }
 
   input.focus();

@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Elyra Installer</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Inter,Segoe UI,sans-serif;
+}
+
+html,body{
+    width:100%;
+    height:100%;
+}
+
+body{
+    background:rgb(20,25,40);
+    color:white;
+    overflow:hidden;
+}
+
+.container{
+    width:100%;
+    height:100%;
+}
+
+.installer{
+    width:100%;
+    height:100%;
+    display:flex;
+    background:rgb(20,25,40);
+}
+
+.sidebar{
+    width:280px;
+    background:rgba(255,255,255,.03);
+    border-right:1px solid rgba(255,255,255,.06);
+    padding:30px;
+    display:flex;
+    flex-direction:column;
+}
+
+.logo{
+    width:90px;
+    height:90px;
+    border-radius:22px;
+    background:linear-gradient(135deg,#5865f2,#00bcd4);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-size:38px;
+    font-weight:700;
+    margin-bottom:20px;
+}
+
+.sidebar h1{
+    font-size:28px;
+    margin-bottom:8px;
+}
+
+.sidebar p{
+    color:#aeb7cb;
+    line-height:1.6;
+}
+
+.steps{
+    margin-top:45px;
+}
+
+.step{
+    padding:12px 14px;
+    border-radius:12px;
+    color:#7d88a4;
+    margin-bottom:10px;
+    transition:.25s;
+}
+
+.step.active{
+    background:rgba(88,101,242,.15);
+    color:#fff;
+}
+
+.content{
+    flex:1;
+    padding:50px;
+    position:relative;
+}
+
+.screen{
+    display:none;
+    animation:fade .35s ease;
+}
+
+.screen.active{
+    display:block;
+}
+
+@keyframes fade{
+    from{
+        opacity:0;
+        transform:translateY(10px);
+    }
+    to{
+        opacity:1;
+        transform:none;
+    }
+}
+
+h2{
+    font-size:36px;
+    margin-bottom:15px;
+}
+
+p{
+    color:#b5bed1;
+    line-height:1.7;
+}
+
+.card{
+    margin-top:25px;
+    padding:22px;
+    background:rgba(255,255,255,.04);
+    border:1px solid rgba(255,255,255,.04);
+    border-radius:18px;
+}
+
+.option{
+    margin:16px 0;
+    display:flex;
+    align-items:center;
+}
+
+.option input{
+    width:18px;
+    height:18px;
+}
+
+.option label{
+    margin-left:10px;
+}
+
+.progress{
+    width:100%;
+    height:18px;
+    border-radius:999px;
+    overflow:hidden;
+    background:rgba(255,255,255,.08);
+    margin-top:30px;
+}
+
+.bar{
+    width:0%;
+    height:100%;
+    background:linear-gradient(90deg,#5865f2,#00bcd4);
+    transition:.2s;
+}
+
+.percent{
+    margin-top:14px;
+    font-size:18px;
+    font-weight:600;
+}
+
+.buttons{
+    position:absolute;
+    right:50px;
+    bottom:40px;
+    display:flex;
+    gap:10px;
+}
+
+button{
+    border:none;
+    padding:12px 24px;
+    border-radius:12px;
+    cursor:pointer;
+    font-weight:600;
+    font-size:14px;
+}
+
+.primary{
+    background:linear-gradient(135deg,#5865f2,#00bcd4);
+    color:white;
+}
+
+.secondary{
+    background:rgba(255,255,255,.08);
+    color:white;
+}
+
+button:hover{
+    opacity:.92;
+}
+
+.success{
+    font-size:90px;
+    margin-bottom:20px;
+}
+
+.footer{
+    position:absolute;
+    left:50px;
+    bottom:40px;
+    color:#6f7a97;
+    font-size:13px;
+}
+
+.install-log{
+    width:100%;
+    max-height:190px;
+    overflow:auto;
+    margin-top:22px;
+    padding:16px;
+    background:rgba(255,255,255,.04);
+    border:1px solid rgba(255,255,255,.04);
+    border-radius:18px;
+    color:#dbe5f7;
+    white-space:pre-wrap;
+}
+
+.modal{
+    position:fixed;
+    inset:0;
+    z-index:20;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    padding:24px;
+}
+
+.modal.active{
+    display:flex;
+}
+
+.modal-backdrop{
+    position:absolute;
+    inset:0;
+    background:rgba(0,0,0,.58);
+    backdrop-filter:blur(8px);
+}
+
+.modal-box{
+    position:relative;
+    width:min(560px,100%);
+    background:rgb(25,31,49);
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:22px;
+    padding:24px;
+    box-shadow:0 30px 90px rgba(0,0,0,.35);
+}
+
+.modal-box h3{
+    font-size:26px;
+    margin-bottom:10px;
+}
+
+.modal-info{
+    margin-top:18px;
+    padding:16px;
+    border-radius:16px;
+    background:rgba(255,255,255,.04);
+    color:#dbe5f7;
+    line-height:1.6;
+}
+
+.modal-log{
+    display:none;
+    max-height:170px;
+    overflow:auto;
+    margin-top:14px;
+    padding:14px;
+    border-radius:16px;
+    background:rgba(0,0,0,.22);
+    color:#dbe5f7;
+    white-space:pre-wrap;
+}
+
+.modal-actions{
+    display:flex;
+    justify-content:flex-end;
+    flex-wrap:wrap;
+    gap:10px;
+    margin-top:22px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="installer">
+
+<div class="sidebar">
+
+<div class="logo">E</div>
+
+<h1>Elyra</h1>
+
+<p>
+Instalador multiplataforma<br>
+Windows • Linux • macOS
+</p>
+
+<div class="steps">
+<div class="step active" id="s1">
+1. Bem-vindo
+</div>
+
+<div class="step" id="s2">
+2. Configuração
+</div>
+
+<div class="step" id="s3">
+3. Instalação
+</div>
+
+<div class="step" id="s4">
+4. Concluído
+</div>
+</div>
+
+</div>
+
+<div class="content">
+
+<!-- Tela 1 -->
+<div class="screen active" id="screen1">
+
+<h2>Bem-vindo ao Elyra</h2>
+
+<p>
+Este assistente instalará a Elyra em seu computador.
+O processo leva apenas alguns minutos.
+</p>
+
+<div class="card">
+Versão 1.0.0<br>
+Compatível com Windows, Linux e macOS.
+</div>
+
+</div>
+
+<!-- Tela 2 -->
+<div class="screen" id="screen2">
+
+<h2>Configuração</h2>
+
+<p>
+Escolha as opções desejadas para a instalação.
+</p>
+
+<div class="card">
+
+<div class="option">
+<input type="checkbox" id="desktop" checked>
+<label for="desktop">
+Criar atalho na Área de Trabalho
+</label>
+</div>
+
+<div class="option">
+<input type="checkbox" id="start" checked>
+<label for="start">
+Adicionar ao Menu Iniciar
+</label>
+</div>
+
+<div class="option">
+<input type="checkbox" id="run" checked>
+<label for="run">
+Executar após concluir
+</label>
+</div>
+
+<div class="option">
+<input type="checkbox" id="updates" checked>
+<label for="updates">
+Habilitar atualizações automáticas
+</label>
+</div>
+
+</div>
+
+</div>
+
+<!-- Tela 3 -->
+<div class="screen" id="screen3">
+
+<h2>Instalando...</h2>
+
+<p id="installText">
+Copiando arquivos, configurando atalhos e preparando ambiente.
+</p>
+
+<div class="progress">
+<div class="bar" id="bar"></div>
+</div>
+
+<div class="percent" id="percent">
+0%
+</div>
+
+<pre class="install-log" id="installLog">Aguardando início da instalação...</pre>
+
+</div>
+
+<!-- Tela 4 -->
+<div class="screen" id="screen4">
+
+<div class="success">✓</div>
+
+<h2>Instalação concluída</h2>
+
+<p>
+Elyra foi instalada com sucesso.
+</p>
+
+<div class="card" id="finishCard">
+Tudo pronto para usar.
+</div>
+
+</div>
+
+<div class="buttons">
+
+<button class="secondary" onclick="backStep()">
+Voltar
+</button>
+
+<button class="primary" id="nextBtn" onclick="nextStep()">
+Avançar
+</button>
+
+</div>
+
+<div class="footer">
+Elyra Installer © 2026
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="modal" id="updateModal" aria-hidden="true">
+<div class="modal-backdrop"></div>
+<div class="modal-box">
+<h3>Você quer atualizar?</h3>
+<p id="updateModalText">
+Encontramos uma nova versão da Elyra no GitHub.
+</p>
+<div class="modal-info" id="updateModalInfo">
+Versão encontrada: -
+</div>
+<pre class="modal-log" id="updateModalLog"></pre>
+<div class="modal-actions">
+<button class="secondary" id="skipUpdateBtn" type="button">Agora não</button>
+<button class="primary" id="confirmUpdateBtn" type="button">Atualizar agora</button>
+</div>
+</div>
+</div>
+
+<script>
+
+let current = 1;
+let installed = false;
+let installRunning = false;
+let pendingUpdate = null;
+
+function parsePayload(raw){
+    return typeof raw === 'string' ? JSON.parse(raw) : raw;
+}
+
+function updateStep(step){
+    document.querySelectorAll('.step')
+    .forEach(el => el.classList.remove('active'));
+
+    document.getElementById('s'+step)
+    .classList.add('active');
+}
+
+function showScreen(screen){
+    document.querySelectorAll('.screen')
+    .forEach(el => el.classList.remove('active'));
+
+    document.getElementById('screen'+screen)
+    .classList.add('active');
+
+    updateStep(screen);
+}
+
+function setButtons(disabled){
+    document.querySelectorAll('button').forEach(button => {
+        button.disabled = disabled;
+    });
+}
+
+function setProgress(value, text){
+    document.getElementById('bar').style.width = value + '%';
+    document.getElementById('percent').innerText = value + '%';
+    if(text){
+        document.getElementById('installText').innerText = text;
+    }
+}
+
+function log(text){
+    const output = document.getElementById('installLog');
+    output.textContent = text || 'Sem logs.';
+    output.scrollTop = output.scrollHeight;
+}
+
+function showUpdateModal(update){
+    pendingUpdate = update;
+    const modal = document.getElementById('updateModal');
+    const info = document.getElementById('updateModalInfo');
+    const version = update.remote_commit || 'nova versão';
+    const message = update.message || 'Atualização disponível';
+    const author = update.author || 'GitHub';
+    const date = update.date || 'data não informada';
+
+    info.innerText = `Versão: ${version}\nCommit: ${message}\nAutor: ${author}\nData: ${date}`;
+    document.getElementById('updateModalLog').style.display = 'none';
+    document.getElementById('updateModalLog').textContent = '';
+    document.getElementById('confirmUpdateBtn').innerText = `Atualizar para ${version}`;
+    document.getElementById('confirmUpdateBtn').disabled = false;
+    document.getElementById('skipUpdateBtn').disabled = false;
+    modal.classList.add('active');
+    modal.setAttribute('aria-hidden','false');
+}
+
+function hideUpdateModal(){
+    const modal = document.getElementById('updateModal');
+    modal.classList.remove('active');
+    modal.setAttribute('aria-hidden','true');
+}
+
+async function checkStartupUpdates(){
+    try{
+        const update = parsePayload(await window.pywebview.api.check_updates());
+        if(update.ok && update.update_available){
+            showUpdateModal(update);
+        }
+    }catch(error){
+        // Sem repositório instalado ou sem internet: não bloqueia o instalador.
+        console.warn('Atualização não verificada:', error);
+    }
+}
+
+async function confirmUpdate(){
+    const button = document.getElementById('confirmUpdateBtn');
+    const skip = document.getElementById('skipUpdateBtn');
+    const logBox = document.getElementById('updateModalLog');
+
+    if(!pendingUpdate) return;
+
+    button.disabled = true;
+    skip.disabled = true;
+    button.innerText = 'Atualizando...';
+    logBox.style.display = 'block';
+    logBox.textContent = 'Atualizando pelo GitHub. Suas configurações serão preservadas...';
+
+    try{
+        const result = parsePayload(await window.pywebview.api.update_app());
+        logBox.textContent = result.log || result.error || 'Atualização finalizada.';
+        if(!result.ok){
+            button.disabled = false;
+            skip.disabled = false;
+            button.innerText = `Atualizar para ${pendingUpdate.remote_commit || 'nova versão'}`;
+            return;
+        }
+
+        document.getElementById('updateModalText').innerText = 'Atualização instalada com sucesso.';
+        document.getElementById('updateModalInfo').innerText = 'A Elyra foi atualizada mantendo suas configurações.';
+        button.innerText = 'Concluído';
+        skip.innerText = 'Fechar';
+        skip.disabled = false;
+        pendingUpdate = null;
+    }catch(error){
+        logBox.textContent = `Erro ao atualizar: ${error}`;
+        button.disabled = false;
+        skip.disabled = false;
+        button.innerText = `Atualizar para ${pendingUpdate.remote_commit || 'nova versão'}`;
+    }
+}
+
+function backStep(){
+    if(current <= 1 || installRunning) return;
+
+    current--;
+    showScreen(current);
+    document.getElementById('nextBtn').innerText = 'Avançar';
+}
+
+function nextStep(){
+    if(current === 1){
+        current = 2;
+        showScreen(2);
+        return;
+    }
+
+    if(current === 2){
+        current = 3;
+        showScreen(3);
+        startInstall();
+        return;
+    }
+
+    if(current === 4){
+        finishInstaller();
+    }
+}
+
+async function startInstall(){
+    if(installed || installRunning) return;
+
+    installRunning = true;
+    setButtons(true);
+    document.getElementById('nextBtn').innerText = 'Instalando...';
+    setProgress(8, 'Verificando dados do instalador...');
+    log('Iniciando instalação real da Elyra...');
+
+    try{
+        await window.pywebview.api.get_setup_data();
+
+        setProgress(24, 'Baixando repositório, criando .venv e instalando dependências...');
+        const install = parsePayload(await window.pywebview.api.auto_install());
+        if(!install.ok){
+            throw new Error(install.log || install.error || 'Falha desconhecida na instalação.');
+        }
+
+        let fullLog = install.log || 'Instalação concluída.';
+        setProgress(78, 'Configurando opções finais...');
+
+        if(document.getElementById('desktop').checked){
+            const shortcut = parsePayload(await window.pywebview.api.create_app_shortcut('Elyra'));
+            fullLog += '\n\n' + (shortcut.log || shortcut.error || '');
+        }
+
+        if(document.getElementById('start').checked){
+            const menuShortcut = parsePayload(await window.pywebview.api.create_menu_shortcut('Elyra'));
+            fullLog += '\n\n' + (menuShortcut.log || menuShortcut.error || '');
+        }
+
+        if(document.getElementById('updates').checked){
+            const updates = parsePayload(await window.pywebview.api.check_updates());
+            if(updates.ok && updates.update_available){
+                fullLog += `\n\nAtualização disponível: ${updates.remote_commit} - ${updates.message}`;
+            }else if(updates.ok){
+                fullLog += '\n\nAtualizações: Elyra já está atualizada.';
+            }else{
+                fullLog += '\n\nAtualizações: ' + (updates.error || 'não foi possível verificar.');
+            }
+        }
+
+        log(fullLog);
+        setProgress(100, 'Tudo pronto para usar.');
+        installed = true;
+        current = 4;
+        showScreen(4);
+        document.getElementById('nextBtn').innerText = 'Finalizar';
+        document.getElementById('finishCard').innerText = 'Instalação concluída. Suas configurações ficam preservadas entre atualizações.';
+    }catch(error){
+        setProgress(100, 'Instalação pausada por erro.');
+        log(String(error));
+        current = 2;
+        document.getElementById('nextBtn').innerText = 'Tentar novamente';
+    }finally{
+        installRunning = false;
+        setButtons(false);
+    }
+}
+
+async function finishInstaller(){
+    if(document.getElementById('run').checked){
+        document.getElementById('nextBtn').innerText = 'Abrindo...';
+        const opened = parsePayload(await window.pywebview.api.open_app());
+        if(!opened.ok){
+            document.getElementById('finishCard').innerText = opened.error || 'Não foi possível abrir a Elyra.';
+            document.getElementById('nextBtn').innerText = 'Finalizar';
+            return;
+        }
+    }
+
+    document.getElementById('finishCard').innerText = 'Tudo pronto. Você já pode fechar este instalador.';
+    document.getElementById('nextBtn').innerText = 'Finalizado';
+}
+
+window.addEventListener('pywebviewready', async () => {
+    try{
+        await window.pywebview.api.get_setup_data();
+        await checkStartupUpdates();
+    }catch(error){
+        log(`Erro ao conectar com o instalador: ${error}`);
+    }
+});
+
+document.getElementById('skipUpdateBtn').addEventListener('click', hideUpdateModal);
+document.getElementById('confirmUpdateBtn').addEventListener('click', confirmUpdate);
+
+</script>
+
+</body>
+</html>

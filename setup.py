@@ -18,14 +18,13 @@ setup(
     description="Assistente IA profissional multi-provedor com interface desktop",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    author="Seu Nome",
-    author_email="seu@email.com",
+    author="Eduxfuhd0909",
     url="https://github.com/Eduxfuhd0909/Elyra",
     license="MIT",
     packages=find_packages(),
     include_package_data=True,
     install_requires=requirements,
-    python_requires=">=3.8",
+    python_requires=">=3.10",
     entry_points={
         "console_scripts": [
             "elyra=app:main",
@@ -37,9 +36,8 @@ setup(
         "Topic :: Communications :: Chat",
         "License :: OSI Approved :: MIT License",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.8",
-        "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3.11",
+        "Programming Language :: Python :: 3.12",
     ],
 )

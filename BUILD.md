@@ -4,7 +4,7 @@ Este guia explica como criar executáveis profissionais para distribuir o Elyra.
 
 ## 📋 Pré-requisitos
 
-- Python 3.8+
+- Python 3.10+
 - pip
 - Git (opcional)
 
@@ -30,29 +30,37 @@ chmod +x build.sh
 ./dist/Elyra/Elyra
 ```
 
-### 2. Windows - .exe Portável
+### 2. Windows - .exe pelo Windows
 
 ```bash
 # No Windows CMD ou PowerShell:
-pip install -r requirements-build.txt
-
-pyinstaller ^
-    --name Elyra ^
-    --onefile ^
-    --windowed ^
-    --icon=web\icon.ico ^
-    --add-data="web;web" ^
-    --add-data="system_prompt.txt;." ^
-    --collect-all=pywebview ^
-    --collect-all=edge_tts ^
-    --collect-all=speech_recognition ^
-    --hidden-import=pywebview.api ^
-    app.py
+packaging\windows\build_exe.bat
 ```
 
-Resultado: `dist/Elyra.exe`
+Resultado: `dist\Elyra Installer.exe`
 
-### 3. macOS - App Bundle
+### 3. Windows - .exe pelo Linux
+
+PyInstaller não faz cross-build Windows usando Python Linux puro. Para gerar `.exe` no Linux, use Wine com Python Windows instalado dentro do Wine:
+
+```bash
+sudo apt install wine
+# Instale Python para Windows no Wine, se ainda não tiver:
+# wine python-3.12.4-amd64.exe
+
+chmod +x packaging/windows/build_exe.sh
+packaging/windows/build_exe.sh
+```
+
+Resultado: `dist/windows/Elyra Installer.exe`
+
+Para gerar uma pasta em vez de arquivo único:
+
+```bash
+packaging/windows/build_exe.sh onedir
+```
+
+### 4. macOS - App Bundle
 
 ```bash
 # Em Mac:
@@ -121,13 +129,11 @@ sudo chmod +x /usr/local/bin/elyra
 ### Opção 1: GitHub Releases
 
 ```bash
-git add dist/
-git commit -m "Release v1.0.0"
 git tag -a v1.0.0 -m "Version 1.0.0"
-git push origin --tags
+git push origin v1.0.0
 ```
 
-Depois crie um Release no GitHub e faça upload dos arquivos:
+Depois crie um Release no GitHub e faça upload dos artefatos gerados. Não commite `dist/` ou `build/` no repositório.
 - `Elyra.exe` (Windows)
 - `Elyra.dmg` (macOS)
 - `Elyra.AppImage` (Linux)

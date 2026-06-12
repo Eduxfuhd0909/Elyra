@@ -2,3 +2,4 @@ pywebview[qt6]>=5.0
 SpeechRecognition>=3.10
 edge-tts>=7.0
 PyAudio>=0.2.14
+discord.py>=2.4

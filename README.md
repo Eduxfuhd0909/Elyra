@@ -1,6 +1,6 @@
-# ⚡ Elyra - Assistente IA Profissional
+# Elyra - Assistente IA Profissional
 
-[![Python 3.8+](https://img.shields.io/badge/Python-3.8+-blue?style=flat-square)](https://www.python.org/)
+[![Python 3.10+](https://img.shields.io/badge/Python-3.10+-blue?style=flat-square)](https://www.python.org/)
 [![License MIT](https://img.shields.io/badge/License-MIT-green?style=flat-square)](LICENSE)
 [![Status Estável](https://img.shields.io/badge/Status-Estável-brightgreen?style=flat-square)](https://github.com/Eduxfuhd0909/Elyra)
 
@@ -12,8 +12,9 @@
 
 - 🎤 **Reconhecimento de Voz** - Fale com a assistente usando SpeechRecognition
 - 🔊 **Síntese de Voz** - Respostas em áudio com edge-tts
-- 💾 **Histórico Local** - Conversas salvas em SQLite
-- 🔄 **Múltiplas Abas** - Organize conversas em abas separadas
+- 💾 **Histórico Local** - Conversas salvas em SQLite na pasta de dados do usuário
+- 🔄 **Múltiplas Abas Persistentes** - Organize conversas separadas sem misturar contexto
+- 🧠 **Memória Curta e Longa** - Usa o contexto recente da conversa e salva fatos importantes para uso futuro
 - 📤 **Exportar** - Salve conversas em Markdown
 - 🌓 **Tema Claro/Escuro** - Interface adaptável
 - ⚙️ **Configurável** - Suporte a múltiplos provedores
@@ -84,6 +85,25 @@ python app.py
 - **Alt+Enter** para enviar
 - 💾 para exportar conversa
 
+## Dados Locais e Privacidade
+
+Por padrão, a Elyra salva histórico e configurações na pasta de dados do usuário:
+
+- Linux: `~/.local/share/Elyra`
+- macOS: `~/Library/Application Support/Elyra`
+- Windows: `%APPDATA%\Elyra`
+
+As API keys são salvas localmente em `elyra_settings.json`. No Linux/macOS, a Elyra tenta restringir a permissão desse arquivo para o usuário atual.
+
+A memória curta usa as mensagens recentes da conversa atual. A memória longa é salva em SQLite quando a Elyra identifica preferências, objetivos, projetos ou fatos estáveis que podem ajudar em conversas futuras. Evite compartilhar dados sensíveis se você não quiser que eles sejam usados como contexto.
+
+Recursos de voz usam serviços externos por padrão:
+
+- Reconhecimento de voz: SpeechRecognition com backend Google.
+- Síntese de voz: `edge-tts`.
+
+Se você precisa de operação totalmente local, desative voz ou substitua esses motores por alternativas locais.
+
 ## 📁 Estrutura do Projeto
 
 ```
@@ -97,8 +117,9 @@ Elyra/
 ├── build.sh                # Script de build
 ├── BUILD.md                # Guia de build/distribuição
 ├── system_prompt.txt       # Instruções da assistente
-├── chat_memory.sqlite3     # Histórico (gerado)
-├── elyra_settings.json     # Configurações (gerado)
+├── installer_app.py        # Instalador/atualizador gráfico
+├── installer_web/          # Interface do instalador
+├── packaging/              # Scripts de empacotamento
 └── web/
     ├── index.html          # Interface HTML
     ├── styles.css          # Estilos modernos
@@ -158,10 +179,10 @@ Edite `web/styles.css`:
 
 ## 🔒 Segurança
 
-⚠️ **Importante:**
+**Importante:**
 - `elyra_settings.json` contém suas API keys - **NÃO compartilhe**
-- Use variáveis de ambiente para chaves sensíveis
-- Não commite `elyra_settings.json` no Git
+- Não commite bancos SQLite, builds, AppImages, `.deb`, `.exe` ou configurações locais
+- Reporte vulnerabilidades seguindo [SECURITY.md](SECURITY.md)
 
 ## 🐛 Troubleshooting
 
@@ -181,7 +202,7 @@ Use `--onefile` no PyInstaller para um arquivo único
 
 ## 📊 Requisitos
 
-- **Python**: 3.8+
+- **Python**: 3.10+
 - **RAM**: 512MB mínimo
 - **Disco**: 200MB (com dependências)
 - **Rede**: Para conectar a provedores online
@@ -192,7 +213,7 @@ Use `--onefile` no PyInstaller para um arquivo único
 
 ## 🤝 Contribuir
 
-Contribuições são bem-vindas! Abra uma [issue](https://github.com/Eduxfuhd0909/Elyra/issues) ou faça um [pull request](https://github.com/Eduxfuhd0909/Elyra/pulls)
+Contribuições são bem-vindas! Veja [CONTRIBUTING.md](CONTRIBUTING.md), abra uma [issue](https://github.com/Eduxfuhd0909/Elyra/issues) ou envie um [pull request](https://github.com/Eduxfuhd0909/Elyra/pulls).
 
 ## 🎥 Para Criadores de Conteúdo
 

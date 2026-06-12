@@ -1,6 +1,9 @@
 # -*- mode: python ; coding: utf-8 -*-
+from pathlib import Path
 
 block_cipher = None
+icon_ico = 'web/icon.ico' if Path('web/icon.ico').exists() else None
+icon_icns = 'web/icon.icns' if Path('web/icon.icns').exists() else None
 
 a = Analysis(
     ['app.py'],
@@ -15,6 +18,8 @@ a = Analysis(
         'pywebview.api',
         'edge_tts',
         'speech_recognition',
+        'discord',
+        'discord.app_commands',
     ],
     hookspath=[],
     hooksconfig={},
@@ -47,13 +52,13 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon='web/icon.ico',
+    icon=icon_ico,
 )
 
 app = BUNDLE(
     exe,
     name='Elyra.app',
-    icon='web/icon.icns',
+    icon=icon_icns,
     bundle_identifier='com.elyra.app',
     info_plist={
         'NSPrincipalClass': 'NSApplication',
