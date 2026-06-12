@@ -1,8 +1,0 @@
-[Desktop Entry]
-Type=Application
-Name=Elyra Installer
-Comment=Instalador e atualizador da Elyra
-Exec=elyra-installer
-Icon=elyra-installer
-Terminal=false
-Categories=Utility;Development;
